@@ -23,10 +23,12 @@ VALIDATOR HELPERS
 func main() {
 	// Create Services
 	userService := service.NewUserService()
+	postService := service.NewPostService()
 	// Create Handlers
 	userHandler := handler.NewUserHandler(userService)
+	postHandler := handler.NewPostHandler(postService)
 
-	r := router.New(userHandler)
+	r := router.New(userHandler, postHandler)
 
 	fmt.Println("Server running on :8080")
 
