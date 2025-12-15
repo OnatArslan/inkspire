@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"inkspire/internal/model"
+	"inkspire/internal/repository"
 )
 
 var (
@@ -11,10 +12,14 @@ var (
 	ErrPasswordTooShort = errors.New("password must be at least 8 characters long")
 )
 
-type UserService struct{}
+type UserService struct {
+	repo repository.UserRepository
+}
 
-func NewUserService() *UserService {
-	return &UserService{}
+func NewUserService(repo repository.UserRepository) *UserService {
+	return &UserService{
+		repo: repo,
+	}
 }
 
 /*
