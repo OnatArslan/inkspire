@@ -12,7 +12,6 @@ func NewPostService() *PostService {
 }
 
 func (s *PostService) CreatePost(ctx context.Context, id, title string, pageNum int) (*model.Post, error) {
-
 	return &model.Post{
 		Id:      id,
 		Title:   title,
