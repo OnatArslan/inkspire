@@ -15,10 +15,12 @@ func New(userHandler *handler.UserHandler, postHandler *handler.PostHandler) htt
 		r.Post("/", userHandler.CreateUser)
 	})
 
+	// POST ROUTES
 	r.Route("/posts", func(r chi.Router) {
 		r.Post("/", postHandler.CreatePost)
+		r.Get("/", postHandler.GetAllPosts)
+		r.Get("/{uuid}", postHandler.GetUserById)
 	})
-	// POST ROUTES
 
 	return r
 }

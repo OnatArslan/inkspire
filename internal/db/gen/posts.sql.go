@@ -7,6 +7,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createPost = `-- name: CreatePost :one
@@ -28,6 +30,59 @@ type CreatePostParams struct {
 
 func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, error) {
 	row := q.db.QueryRow(ctx, createPost, arg.Title, arg.Content)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Content,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getAllPosts = `-- name: GetAllPosts :many
+SELECT
+    id, title, content, created_at
+FROM
+    posts p
+`
+
+func (q *Queries) GetAllPosts(ctx context.Context) ([]Post, error) {
+	rows, err := q.db.Query(ctx, getAllPosts)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Post
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Content,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPostById = `-- name: GetPostById :one
+SELECT
+    id, title, content, created_at
+FROM
+    posts p
+WHERE
+    p.id = $1
+`
+
+func (q *Queries) GetPostById(ctx context.Context, id pgtype.UUID) (Post, error) {
+	row := q.db.QueryRow(ctx, getPostById, id)
 	var i Post
 	err := row.Scan(
 		&i.ID,
