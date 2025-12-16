@@ -8,6 +8,13 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Post struct {
+	ID        pgtype.UUID
+	Title     string
+	Content   string
+	CreatedAt pgtype.Timestamptz
+}
+
 type User struct {
 	ID        int64
 	Email     string

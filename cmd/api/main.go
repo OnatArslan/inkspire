@@ -7,7 +7,6 @@ import (
 	"inkspire/internal/handler"
 	"inkspire/internal/repository"
 	"inkspire/internal/router"
-	"inkspire/internal/service"
 	"log"
 	"net/http"
 
@@ -21,7 +20,7 @@ type HealthResponse struct {
 func main() {
 	ctx := context.Background()
 
-	pool, err := pgxpool.New(ctx, "postgres://inkspire_user:sudosu@localhost:5432/inkspire?sslmode=disable")
+	pool, err := pgxpool.New(ctx, "postgres://postgres:sudosu@localhost:5432/inkspire?sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,16 +32,11 @@ func main() {
 	// Creating repositories
 	userRepo := repository.NewUserRepoSQLC(queries)
 
-	// Create Services
-	userService := service.NewUserService(userRepo)
-	postService := service.NewPostService()
-
 	// Create Handlers
-	userHandler := handler.NewUserHandler(userService)
-	postHandler := handler.NewPostHandler(postService)
+	userHandler := handler.NewUserHandler(userRepo)
 
 	// give handlers as paramater to router.New()
-	r := router.New(userHandler, postHandler)
+	r := router.New(userHandler)
 
 	fmt.Println("Server running on :8080")
 

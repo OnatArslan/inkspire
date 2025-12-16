@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"inkspire/internal/httpx"
-	"inkspire/internal/service"
+	"inkspire/internal/repository"
 	"net/http"
 )
 
@@ -13,12 +13,12 @@ type CreateUserRequest struct {
 }
 
 type UserHandler struct {
-	userService *service.UserService
+	repo repository.UserRepository
 }
 
-func NewUserHandler(userService *service.UserService) *UserHandler {
+func NewUserHandler(repo repository.UserRepository) *UserHandler {
 	return &UserHandler{
-		userService: userService,
+		repo: repo,
 	}
 }
 
@@ -34,15 +34,12 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.userService.CreateUser(
-		r.Context(),
-		req.Email,
-		req.Password,
-	)
+	email, err := h.repo.Create(r.Context(), req.Email, req.Password)
+
 	if err != nil {
-		httpx.WriteError(w, http.StatusBadRequest, err.Error())
+		httpx.WriteError(w, http.StatusConflict, err.Error())
 		return
 	}
 
-	httpx.WriteJSON(w, http.StatusCreated, user)
+	httpx.WriteJSON(w, http.StatusCreated, email)
 }

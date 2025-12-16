@@ -1,7 +1,10 @@
 package model
 
+import "time"
+
 type Post struct {
-	Id      string
-	Title   string
-	PageNum int
+	ID        string
+	Title     string
+	Content   string
+	CreatedAt time.Time
 }

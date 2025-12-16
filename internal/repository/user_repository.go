@@ -7,7 +7,7 @@ import (
 )
 
 type UserRepository interface {
-	Create(ctx context.Context, user *model.User) error
+	Create(ctx context.Context, email, password string) (string, error)
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
 }
 
@@ -19,11 +19,12 @@ func NewUserRepoSQLC(q *db.Queries) *UserRepoSQLC {
 	return &UserRepoSQLC{q: q}
 }
 
-func (r *UserRepoSQLC) Create(ctx context.Context, user *model.User) error {
-	return r.q.CreateUser(ctx, db.CreateUserParams{
-		Email:    user.Email,
-		Password: user.Password,
+func (r *UserRepoSQLC) Create(ctx context.Context, email, password string) (string, error) {
+	email, err := r.q.CreateUser(ctx, db.CreateUserParams{
+		Email:    email,
+		Password: password,
 	})
+	return email, err
 }
 
 func (r *UserRepoSQLC) GetByEmail(ctx context.Context, email string) (*model.User, error) {

@@ -1,0 +1,12 @@
+migrate create -ext sql -dir ./internal/db/migrations -seq <migration_name>
+
+migrate -source file://internal/db/migrations -database "postgres://postgres:sudosu@localhost:5432/inkspire?sslmode=disable" up --> run migrations
+
+
+
+
+psql -U postgres -d inkspire -h localhost --> connect to database
+    \l -> show databases
+    \dt -> show tables
+    \c db_name -> connect database
+    \d table_name -> give info about table

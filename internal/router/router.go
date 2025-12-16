@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func New(userHandler *handler.UserHandler, postHandler *handler.PostHandler) http.Handler {
+func New(userHandler *handler.UserHandler) http.Handler {
 	r := chi.NewRouter()
 
 	// USER ROUTES
@@ -16,9 +16,6 @@ func New(userHandler *handler.UserHandler, postHandler *handler.PostHandler) htt
 	})
 
 	// POST ROUTES
-	r.Route("/posts", func(r chi.Router) {
-		r.Post("/", postHandler.CreatePost)
-	})
 
 	return r
 }
