@@ -31,12 +31,13 @@ func main() {
 
 	// Creating repositories
 	userRepo := repository.NewUserRepoSQLC(queries)
-
+	postRepo := repository.NewPostRepositorySQLC(queries)
 	// Create Handlers
 	userHandler := handler.NewUserHandler(userRepo)
+	postHandler := handler.NewPostHandler(postRepo)
 
 	// give handlers as paramater to router.New()
-	r := router.New(userHandler)
+	r := router.New(userHandler, postHandler)
 
 	fmt.Println("Server running on :8080")
 

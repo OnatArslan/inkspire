@@ -7,11 +7,6 @@ import (
 	"net/http"
 )
 
-type CreateUserRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 type UserHandler struct {
 	repo repository.UserRepository
 }
@@ -25,6 +20,11 @@ func NewUserHandler(repo repository.UserRepository) *UserHandler {
 /*
 USER HANDLERS --- ---
 */
+
+type CreateUserRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
 
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var req CreateUserRequest
