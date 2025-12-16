@@ -9,8 +9,10 @@ import (
 	"inkspire/internal/router"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 )
 
 type HealthResponse struct {
@@ -20,16 +22,25 @@ type HealthResponse struct {
 func main() {
 	ctx := context.Background()
 
-	pool, err := pgxpool.New(ctx, "postgres://postgres:sudosu@localhost:5432/inkspire?sslmode=disable")
-	if err != nil {
+	// Load env variables
+	if err := godotenv.Load(); err != nil {
 		log.Fatal(err)
 	}
 
+	db_url := os.Getenv("DB_URL")
+
+	// Creating pgx pool (not used yet)
+	pool, err := pgxpool.New(ctx, db_url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// close open pool
 	defer pool.Close()
 
+	// use this pool in sqlc queries
 	queries := db.New(pool)
 
-	// Creating repositories
+	// Creating repositories (SQLC Repos) but in handlers we use repo interface
 	userRepo := repository.NewUserRepoSQLC(queries)
 	postRepo := repository.NewPostRepositorySQLC(queries)
 	// Create Handlers

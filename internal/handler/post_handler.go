@@ -26,7 +26,13 @@ func (h *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	var req CreatePostRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		httpx.WriteError(w, http.StatusBadRequest, "Invalid JSON body")
+		return
+	}
+	post, err := h.repo.CreatePost(r.Context(), req.Title, req.Content)
+	if err != nil {
+		httpx.WriteError(w, http.StatusConflict, err.Error())
+		return
 	}
 
-	httpx.WriteJSON(w, http.StatusCreated, req)
+	httpx.WriteJSON(w, http.StatusCreated, *post)
 }

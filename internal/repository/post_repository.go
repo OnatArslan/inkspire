@@ -30,7 +30,7 @@ func (r *PostRepositorySQLC) CreatePost(ctx context.Context, title, content stri
 	}
 
 	return &model.Post{
-		ID:        string(db_post.Title),
+		ID:        db_post.ID.String(),
 		Title:     db_post.Title,
 		Content:   db_post.Content,
 		CreatedAt: db_post.CreatedAt.Time,
