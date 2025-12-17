@@ -24,7 +24,7 @@ func NewCommentHandler(repo CommentRepository) *CommentHandler {
 }
 
 type CreateCommentRequest struct {
-	Content string `json:"content" validate:"required,min=5"`
+	Content string `json:"content" validate:"required,min=5,max=400"`
 }
 
 func (h CommentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
