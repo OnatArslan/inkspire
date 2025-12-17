@@ -1,19 +1,29 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
-	"inkspire/internal/httpx"
-	"inkspire/internal/repository"
+
+	"inkspire/internal/helper/response"
+	"inkspire/internal/model"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 )
 
-type PostHandler struct {
-	repo repository.PostRepository
+// We will use this repo in handlers
+type PostRepository interface {
+	CreatePost(ctx context.Context, title, content string) (*model.Post, error)
+	GetAllPosts(ctx context.Context) ([]model.Post, error)
+	GetPostById(ctx context.Context, id string) (*model.Post, error)
 }
 
-func NewPostHandler(repo repository.PostRepository) *PostHandler {
+// Common use is is handler.repo.xyz
+type PostHandler struct {
+	repo PostRepository
+}
+
+func NewPostHandler(repo PostRepository) *PostHandler {
 	return &PostHandler{
 		repo: repo,
 	}
@@ -27,27 +37,27 @@ type CreatePostRequest struct {
 func (h *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	var req CreatePostRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httpx.WriteError(w, http.StatusBadRequest, "Invalid JSON body")
+		response.WriteError(w, http.StatusBadRequest, "Invalid JSON body")
 		return
 	}
 	post, err := h.repo.CreatePost(r.Context(), req.Title, req.Content)
 	if err != nil {
-		httpx.WriteError(w, http.StatusConflict, err.Error())
+		response.WriteError(w, http.StatusConflict, err.Error())
 		return
 	}
 
-	httpx.WriteJSON(w, http.StatusCreated, *post)
+	response.WriteJSON(w, http.StatusCreated, *post)
 }
 
 func (h *PostHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
 	// We don't need to decode anything
 	users, err := h.repo.GetAllPosts(r.Context())
 	if err != nil {
-		httpx.WriteError(w, http.StatusNotFound, err.Error())
+		response.WriteError(w, http.StatusNotFound, err.Error())
 		return
 	}
 
-	httpx.WriteJSON(w, http.StatusOK, users)
+	response.WriteJSON(w, http.StatusOK, users)
 }
 
 func (h *PostHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
@@ -55,8 +65,8 @@ func (h *PostHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
 
 	post, err := h.repo.GetPostById(r.Context(), id)
 	if err != nil {
-		httpx.WriteError(w, http.StatusNotFound, err.Error())
+		response.WriteError(w, http.StatusNotFound, err.Error())
 	}
 
-	httpx.WriteJSON(w, http.StatusOK, *post)
+	response.WriteJSON(w, http.StatusOK, *post)
 }

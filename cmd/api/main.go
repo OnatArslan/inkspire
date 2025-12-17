@@ -20,6 +20,7 @@ type HealthResponse struct {
 }
 
 func main() {
+	// General ctx
 	ctx := context.Background()
 
 	// Load env variables
@@ -27,17 +28,18 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Getting env variables from .env
 	db_url := os.Getenv("DB_URL")
 
-	// Creating pgx pool (not used yet)
+	// Creating pgx pool (will be used in new sqlc db)
 	pool, err := pgxpool.New(ctx, db_url)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// close open pool
+	// close the pool
 	defer pool.Close()
 
-	// use this pool in sqlc queries
+	// This queries will be used in sqlc repos
 	queries := db.New(pool)
 
 	// Creating repositories (SQLC Repos) but in handlers we use repo interface

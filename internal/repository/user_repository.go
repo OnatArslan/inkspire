@@ -6,11 +6,6 @@ import (
 	"inkspire/internal/model"
 )
 
-type UserRepository interface {
-	Create(ctx context.Context, email, password string) (string, error)
-	GetByEmail(ctx context.Context, email string) (*model.User, error)
-}
-
 type UserRepoSQLC struct {
 	q *db.Queries
 }

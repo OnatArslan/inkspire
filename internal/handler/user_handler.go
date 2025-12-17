@@ -1,17 +1,29 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
-	"inkspire/internal/httpx"
-	"inkspire/internal/repository"
+	"inkspire/internal/helper/response"
+	"inkspire/internal/model"
 	"net/http"
 )
 
-type UserHandler struct {
-	repo repository.UserRepository
+/*
+* Real repository is UserRepositorySQLC and this repository implements this interface
+* We are doing this because accessing repo(sqlc) directly with handler is bad practice
+* We can use this user repo interface on handler
+* Layer is like this sqlcRepo -> repo interface -> handler
+ */
+type UserRepository interface {
+	Create(ctx context.Context, email, password string) (string, error)
+	GetByEmail(ctx context.Context, email string) (*model.User, error)
 }
 
-func NewUserHandler(repo repository.UserRepository) *UserHandler {
+type UserHandler struct {
+	repo UserRepository
+}
+
+func NewUserHandler(repo UserRepository) *UserHandler {
 	return &UserHandler{
 		repo: repo,
 	}
@@ -30,16 +42,16 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var req CreateUserRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httpx.WriteError(w, http.StatusBadRequest, "invalid JSON body")
+		response.WriteError(w, http.StatusBadRequest, "invalid JSON body")
 		return
 	}
 
 	email, err := h.repo.Create(r.Context(), req.Email, req.Password)
 
 	if err != nil {
-		httpx.WriteError(w, http.StatusConflict, err.Error())
+		response.WriteError(w, http.StatusConflict, err.Error())
 		return
 	}
 
-	httpx.WriteJSON(w, http.StatusCreated, email)
+	response.WriteJSON(w, http.StatusCreated, email)
 }

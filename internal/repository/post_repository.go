@@ -18,12 +18,6 @@ func NewPostRepositorySQLC(q *db.Queries) *PostRepositorySQLC {
 	}
 }
 
-type PostRepository interface {
-	CreatePost(ctx context.Context, title, content string) (*model.Post, error)
-	GetAllPosts(ctx context.Context) ([]model.Post, error)
-	GetPostById(ctx context.Context, id string) (*model.Post, error)
-}
-
 func (r *PostRepositorySQLC) CreatePost(ctx context.Context, title, content string) (*model.Post, error) {
 	db_post, err := r.q.CreatePost(ctx, db.CreatePostParams{
 		Title:   title,
