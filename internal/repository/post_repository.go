@@ -40,7 +40,7 @@ func (r *PostRepositorySQLC) GetAllPosts(ctx context.Context) ([]model.Post, err
 	if err != nil {
 		return nil, err
 	}
-	var posts = make([]model.Post, len(db_posts))
+	var posts = make([]model.Post, 0, len(db_posts))
 
 	for _, v := range db_posts {
 		post := model.Post{

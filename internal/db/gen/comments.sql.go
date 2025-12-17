@@ -7,11 +7,13 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createComment = `-- name: CreateComment :one
 INSERT INTO
-    comments (content)
+    "comments" (content)
 VALUES
     ($1)
 RETURNING
@@ -22,6 +24,51 @@ RETURNING
 
 func (q *Queries) CreateComment(ctx context.Context, content string) (Comment, error) {
 	row := q.db.QueryRow(ctx, createComment, content)
+	var i Comment
+	err := row.Scan(&i.ID, &i.Content, &i.CreatedAt)
+	return i, err
+}
+
+const getAllComments = `-- name: GetAllComments :many
+SELECT
+    id, content, created_at
+FROM
+    "comments"
+LIMIT
+    100
+`
+
+func (q *Queries) GetAllComments(ctx context.Context) ([]Comment, error) {
+	rows, err := q.db.Query(ctx, getAllComments)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Comment
+	for rows.Next() {
+		var i Comment
+		if err := rows.Scan(&i.ID, &i.Content, &i.CreatedAt); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCommentById = `-- name: GetCommentById :one
+SELECT
+    id, content, created_at
+FROM
+    "comments" c
+WHERE
+    c.id = $1
+`
+
+func (q *Queries) GetCommentById(ctx context.Context, id pgtype.UUID) (Comment, error) {
+	row := q.db.QueryRow(ctx, getCommentById, id)
 	var i Comment
 	err := row.Scan(&i.ID, &i.Content, &i.CreatedAt)
 	return i, err

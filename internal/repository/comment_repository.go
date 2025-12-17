@@ -4,6 +4,8 @@ import (
 	"context"
 	db "inkspire/internal/db/gen"
 	"inkspire/internal/model"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type CommentRepositorySQLC struct {
@@ -28,4 +30,40 @@ func (r *CommentRepositorySQLC) CreateComment(ctx context.Context, content strin
 		Created_at: db_comment.CreatedAt.Time,
 	}, nil
 
+}
+
+func (r *CommentRepositorySQLC) GetAllComments(ctx context.Context) ([]model.Comment, error) {
+	db_comments, err := r.q.GetAllComments(ctx)
+	if err != nil {
+		return nil, err
+	}
+	comments := make([]model.Comment, 0, len(db_comments))
+	for _, comment := range db_comments {
+		comments = append(comments, model.Comment{
+			Id:         comment.ID.String(),
+			Content:    comment.Content,
+			Created_at: comment.CreatedAt.Time,
+		})
+	}
+
+	return comments, nil
+}
+
+func (r *CommentRepositorySQLC) GetCommentById(ctx context.Context, id string) (*model.Comment, error) {
+	var uuid pgtype.UUID
+
+	if err := uuid.Scan(id); err != nil {
+		return nil, err
+	}
+
+	db_comment, err := r.q.GetCommentById(ctx, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Comment{
+		Id:         db_comment.ID.String(),
+		Content:    db_comment.Content,
+		Created_at: db_comment.CreatedAt.Time,
+	}, nil
 }

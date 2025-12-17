@@ -60,12 +60,13 @@ func (h *PostHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
 	response.WriteJSON(w, http.StatusOK, users)
 }
 
-func (h *PostHandler) GetUserById(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "uuid")
+func (h *PostHandler) GetPostById(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
 
 	post, err := h.repo.GetPostById(r.Context(), id)
 	if err != nil {
 		response.WriteError(w, http.StatusNotFound, err.Error())
+		return
 	}
 
 	response.WriteJSON(w, http.StatusOK, *post)
