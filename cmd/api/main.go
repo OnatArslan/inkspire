@@ -45,12 +45,15 @@ func main() {
 	// Creating repositories (SQLC Repos) but in handlers we use repo interface
 	userRepo := repository.NewUserRepoSQLC(queries)
 	postRepo := repository.NewPostRepositorySQLC(queries)
+	commentRepo := repository.NewCommentRepositorySQLC(queries)
+
 	// Create Handlers
 	userHandler := handler.NewUserHandler(userRepo)
 	postHandler := handler.NewPostHandler(postRepo)
+	commentHandler := handler.NewCommentHandler(commentRepo)
 
 	// give handlers as paramater to router.New()
-	r := router.New(userHandler, postHandler)
+	r := router.New(userHandler, postHandler, commentHandler)
 
 	fmt.Println("Server running on :8080")
 
