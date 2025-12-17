@@ -23,14 +23,14 @@ func (r *UserRepoSQLC) Create(ctx context.Context, email, password string) (stri
 }
 
 func (r *UserRepoSQLC) GetByEmail(ctx context.Context, email string) (*model.User, error) {
-	u, err := r.q.GetUserByEmail(ctx, email)
+	db_user, err := r.q.GetUserByEmail(ctx, email)
 	if err != nil {
 		return nil, err
 	}
 	return &model.User{
-		ID:        u.ID,
-		Email:     u.Email,
-		Password:  u.Password,
-		CreatedAt: u.CreatedAt.Time,
+		ID:        db_user.ID.String(),
+		Email:     db_user.Email,
+		Password:  db_user.Password,
+		CreatedAt: db_user.CreatedAt.Time,
 	}, nil
 }

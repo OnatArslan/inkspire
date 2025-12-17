@@ -1,6 +1,6 @@
 migrate create -ext sql -dir ./internal/db/migrations -seq <migration_name>
 
-migrate -source file://internal/db/migrations -database "postgres://postgres:sudosu@localhost:5432/inkspire?sslmode=disable" up --> run migrations
+migrate -database "postgres://postgres:sudosu@localhost:5432/inkspire?sslmode=disable" -path file://internal/db/migrations up --> run migrations
 
 
 
